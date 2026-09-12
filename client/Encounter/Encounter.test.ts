@@ -1,5 +1,6 @@
 import { buildEncounter } from "../test/buildEncounter";
 
+import { PersistentCharacter } from "../../common/PersistentCharacter";
 import { StatBlock } from "../../common/StatBlock";
 import { Tag } from "../Combatant/Tag";
 import { InitializeTestSettings } from "../test/InitializeTestSettings";
@@ -126,6 +127,49 @@ describe("Encounter", () => {
         "Thrice Daily Action [3/3]\n\n" +
         "Recharge Action [1/1]"
     );
+  });
+
+  test("Should properly populate beancounters for a new Player Character", () => {
+    const persistentCharacter = PersistentCharacter.Initialize({
+      ...StatBlock.Default(),
+      Traits: [
+        {
+          Name: "Spellcasting",
+          Content: "1st level (2 slots): (spells not recorded on sheet)"
+        }
+      ],
+      Player: "player"
+    });
+
+    const combatant = encounter.AddCombatantFromPersistentCharacter(
+      persistentCharacter,
+      jest.fn()
+    );
+
+    expect(combatant.CurrentNotes()).toBe(
+      "Spellcasting Slots\n\n1st Level [2/2]"
+    );
+  });
+
+  test("A Player Character's existing Notes are not overwritten when added to an encounter", () => {
+    const persistentCharacter = PersistentCharacter.Initialize({
+      ...StatBlock.Default(),
+      Traits: [
+        {
+          Name: "Spellcasting",
+          Content: "1st level (2 slots): (spells not recorded on sheet)"
+        }
+      ],
+      Player: "player"
+    });
+    persistentCharacter.Notes = "1st Level [1/2]";
+
+    const combatant = encounter.AddCombatantFromPersistentCharacter(
+      persistentCharacter,
+      jest.fn()
+    );
+
+    expect(combatant.CurrentNotes()).toBe("1st Level [1/2]");
   });
 
   describe("Initiative Ordering", () => {

@@ -243,7 +243,9 @@ export class Encounter {
       Alias: "",
       IndexLabel: null,
       CurrentHP: persistentCharacter.CurrentHP,
-      CurrentNotes: persistentCharacter.Notes,
+      CurrentNotes:
+        persistentCharacter.Notes ||
+        AutoPopulatedNotes(persistentCharacter.StatBlock),
       TemporaryHP: 0,
       Hidden: hideOnAdd,
       RevealedAC: false,
